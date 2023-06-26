@@ -1,0 +1,30 @@
+# Directories
+node_modules/
+dist/
+
+# Environment files
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+
+# Build files
+*.js
+*.js.map
+*.d.ts
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+
+# Editor specific files
+*.swp
+*~
