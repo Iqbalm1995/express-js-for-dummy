@@ -5,11 +5,15 @@ export const sendResponse = <T>(
   res: Response,
   statusCode: number,
   message: string,
-  data: T
+  data: T,
+  count: number,
+  countTotal: number
 ): void => {
   const response: ApiResponse<T> = {
     statusCode,
     message,
+    count,
+    countTotal,
     data,
   };
 

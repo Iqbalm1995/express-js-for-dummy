@@ -4,8 +4,13 @@ import {
   deleteUser,
   getUserById,
   getUsers,
+  handleImageUpload,
   updateUser,
 } from "../controllers/usersController";
+import multer from "multer";
+import { logger } from "../config/logger";
+import { json } from "sequelize";
+import { upload } from "../config/multerConfig";
 
 const router = express.Router();
 
@@ -205,5 +210,45 @@ router.put("/:id", updateUser);
  *         description: Internal server error
  */
 router.delete("/:id", deleteUser);
+
+/**
+ * @swagger
+ * /users/upload-image:
+ *   post:
+ *     summary: Upload user image
+ *     description: Uploads an image for a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 description: The ID of the user.
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The image file to upload.
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Ok
+ *                 data:
+ *                   type: array
+ */
+// router.post("/upload-image", handleImageUpload);
+router.post("/upload-image", upload.single("image"), handleImageUpload);
 
 export default router;
