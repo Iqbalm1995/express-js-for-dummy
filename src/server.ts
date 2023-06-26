@@ -17,9 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Create a multer instance and configure its storage
-const upload = multer({ dest: "uploads/" }); // Set the destination folder for uploaded files
+//const upload = multer({ dest: "uploads/" }); // Set the destination folder for uploaded files
 // Use the multer middleware for handling form data parsing
-app.use(upload.any());
+//app.use(upload.any());
 
 setupSwagger(app);
 

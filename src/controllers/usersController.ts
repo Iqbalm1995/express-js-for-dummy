@@ -206,7 +206,7 @@ export const deleteUser = async (
 
 export const handleImageUpload = async (req: Request, res: Response) => {
   const userId = req.body.id; // Access the user ID from the request body
-  const file = (req.files as Express.Multer.File[])[0]; // Access the uploaded file using req.file
+  const file = req.file; // Access the uploaded file using req.file
 
   logger.info(json({ requestFile: file })); // log
 
