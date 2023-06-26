@@ -5,7 +5,6 @@ import swaggerJsDoc from "swagger-jsdoc";
 const glob = require("glob");
 
 // Resolve file paths matching the glob pattern
-const routeFiles = glob.sync("../routes/*.ts");
 
 const options = {
   swaggerDefinition: {

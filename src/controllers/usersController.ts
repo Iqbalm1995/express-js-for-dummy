@@ -2,11 +2,9 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import User from "../models/userModel";
 import { HttpStatus } from "../constants/constants";
-import { ApiResponse } from "../models/interface/iResponseData";
-import {
-  GetUsersRequestParams,
-  UserRequestUpdate,
-} from "../models/interface/usersInterface";
+import { GetUsersRequestParams } from "../models/interface/usersInterface";
+import { CustomError } from "../errors/CustomError";
+import { sendResponse } from "../constants/response";
 
 // GET /users
 export const getUsers = async (
@@ -32,21 +30,17 @@ export const getUsers = async (
       ...queryOptions,
     });
 
-    const response: ApiResponse<User[]> = {
-      statusCode: HttpStatus.OK,
-      message: "Ok",
-      data: users,
-    };
-
-    res.status(HttpStatus.OK).json(response);
+    sendResponse(res, HttpStatus.OK, "Success", users);
   } catch (error) {
-    console.error("Error retrieving users:", error);
-    const response: ApiResponse<User[]> = {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: "Internal server error",
-      data: [],
-    };
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(response);
+    console.error("Error :", error);
+    if (error instanceof CustomError) {
+      const { statusCode, message } = error;
+      res.status(statusCode).json({ statusCode, message });
+    } else {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+    }
   }
 };
 
@@ -58,24 +52,21 @@ export const getUserById = async (req: Request, res: Response) => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      //return res.status(404).json({ message: "User not found" });
+      throw new CustomError(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    const response: ApiResponse<User> = {
-      statusCode: HttpStatus.OK,
-      message: "Ok",
-      data: user,
-    };
-
-    res.status(HttpStatus.OK).json(response);
+    sendResponse(res, HttpStatus.OK, "Success", user);
   } catch (error) {
-    console.error("Error retrieving users:", error);
-    const response: ApiResponse<User[]> = {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: "Internal server error",
-      data: [],
-    };
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(response);
+    console.error("Error :", error);
+    if (error instanceof CustomError) {
+      const { statusCode, message } = error;
+      res.status(statusCode).json({ statusCode, message });
+    } else {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+    }
   }
 };
 
@@ -85,20 +76,18 @@ export const createUser = async (req: Request, res: Response) => {
 
   try {
     const user = await User.create({ name, age, email, address });
-    const response: ApiResponse<User> = {
-      statusCode: HttpStatus.CREATED,
-      message: "Created",
-      data: user,
-    };
-    res.status(HttpStatus.CREATED).json(response);
+
+    sendResponse(res, HttpStatus.CREATED, "Success Created", user);
   } catch (error) {
-    console.error("Error creating user:", error);
-    const response: ApiResponse<User[]> = {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: "Internal server error",
-      data: [],
-    };
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(response);
+    console.error("Error :", error);
+    if (error instanceof CustomError) {
+      const { statusCode, message } = error;
+      res.status(statusCode).json({ statusCode, message });
+    } else {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+    }
   }
 };
 
@@ -112,12 +101,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      const response: ApiResponse<User[]> = {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: "User not found",
-        data: [],
-      };
-      return res.status(HttpStatus.NOT_FOUND).json(response);
+      throw new CustomError(HttpStatus.NOT_FOUND, "User not found");
     }
 
     // Update the user's attributes
@@ -128,20 +112,18 @@ export const updateUser = async (req: Request, res: Response) => {
 
     // Save the changes
     await user.save();
-    const response: ApiResponse<User> = {
-      statusCode: HttpStatus.OK,
-      message: "Updated",
-      data: user,
-    };
-    res.status(HttpStatus.OK).json(response);
+
+    sendResponse(res, HttpStatus.OK, "Success Updated", user);
   } catch (error) {
-    console.error("Error updating user:", error);
-    const response: ApiResponse<User[]> = {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: "Internal server error",
-      data: [],
-    };
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(response);
+    console.error("Error :", error);
+    if (error instanceof CustomError) {
+      const { statusCode, message } = error;
+      res.status(statusCode).json({ statusCode, message });
+    } else {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+    }
   }
 };
 
@@ -158,23 +140,21 @@ export const deleteUser = async (
 
     if (deletedUser === 0) {
       // User not found
-      res.status(HttpStatus.NOT_FOUND).json({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: "User not found",
-      });
-    } else {
-      // User deleted successfully
-      res.json({
-        statusCode: HttpStatus.OK,
-        message: "User deleted successfully",
-      });
+      throw new CustomError(HttpStatus.NOT_FOUND, "User not found");
     }
+
+    // User deleted successfully
+    sendResponse(res, HttpStatus.OK, "Success Deleted", []);
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: "Internal server error",
-    });
+    console.error("Error :", error);
+    if (error instanceof CustomError) {
+      const { statusCode, message } = error;
+      res.status(statusCode).json({ statusCode, message });
+    } else {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+    }
   }
 };
 
