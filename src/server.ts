@@ -4,7 +4,6 @@ import usersRouter from "./routes/users";
 import { setupSwagger } from "./config/swagger";
 import * as winston from "winston";
 import * as expressWinston from "express-winston";
-import multer from "multer";
 
 // Load the environment variables from .env file
 dotenv.config();

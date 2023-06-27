@@ -8,6 +8,7 @@ import { sendResponse } from "../constants/response";
 import { logger } from "../config/logger";
 import { json } from "sequelize";
 import { BasePagination } from "../config/basePagination";
+import fs from "fs";
 
 // GET /users
 export const getUsers = async (
@@ -210,18 +211,6 @@ export const handleImageUpload = async (req: Request, res: Response) => {
 
   logger.info(json({ requestFile: file })); // log
 
-  // example req file
-  // "requestFile": {
-  //   "destination": "uploads/",
-  //   "encoding": "7bit",
-  //   "fieldname": "image",
-  //   "filename": "ab346553825e6acaa2a41ee2f8084100",
-  //   "mimetype": "image/png",
-  //   "originalname": "bank-bjb-vektor.png",
-  //   "path": "uploads\\ab346553825e6acaa2a41ee2f8084100",
-  //   "size": 31180
-  // }
-
   try {
     // Find the user by ID
     const user = await User.findByPk(userId);
@@ -237,9 +226,16 @@ export const handleImageUpload = async (req: Request, res: Response) => {
       throw new CustomError(HttpStatus.NOT_FOUND, "File not found");
     }
 
-    const imagePath = file.path; // Access the path of the uploaded image
+    // Delete the uploaded file if it exists
+    // if (req.file && req.file.path) {
+    //   fs.unlink(req.file.path, (err) => {
+    //     if (err) {
+    //       console.error("Error deleting file:", err);
+    //     }
+    //   });
+    // }
 
-    logger.warn(json({ imagePath: imagePath })); // log
+    const imagePath = file.path; // Access the path of the uploaded image
 
     const counting = 0;
     const countTotal = 0;
@@ -248,7 +244,11 @@ export const handleImageUpload = async (req: Request, res: Response) => {
       res,
       HttpStatus.OK,
       "Image Uploaded",
-      json({ imagePath: imagePath }),
+      json({
+        origin: file.originalname,
+        filename: file.filename,
+        imagePath: imagePath,
+      }),
       counting,
       countTotal
     );
